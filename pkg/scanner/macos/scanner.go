@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -131,19 +132,53 @@ func (s s) Scan(ctx context.Context, mount, vmURI, platform, osType string) (sca
 }
 
 func (s s) scanFS(ctx context.Context, mount string) (trivyTypes.Report, error) {
+	opts, err := s.fsOpts(mount)
+	if err != nil {
+		return trivyTypes.Report{}, err
+	}
+	slog.InfoContext(
+		ctx,
+		"excluding macOS mounted volumes",
+		"paths",
+		opts.SkipDirs,
+	)
+
+	// Host scans inspect installed libraries without resolving parent POMs
+	// in source trees, where cycles can overflow Trivy's parser stack.
+	runner, err := artifact.NewRunner(ctx, opts, artifact.TargetRootfs)
+	if err != nil {
+		return trivyTypes.Report{}, fmt.Errorf(
+			"initializing filesystem scanner: %w",
+			err,
+		)
+	}
+	defer runner.Close(ctx)
+
+	report, err := runner.ScanRootfs(ctx, opts)
+	if err != nil {
+		return trivyTypes.Report{}, fmt.Errorf(
+			"scanning filesystem %q: %w",
+			mount,
+			err,
+		)
+	}
+	return report, nil
+}
+
+func (s s) fsOpts(mount string) (flag.Options, error) {
 	cacheDir := s.cacheDir
 	if cacheDir == "" {
 		var err error
 		cacheDir, err = os.UserCacheDir()
 		if err != nil {
-			return trivyTypes.Report{}, fmt.Errorf(
+			return flag.Options{}, fmt.Errorf(
 				"getting user cache directory: %w",
 				err,
 			)
 		}
 	}
 
-	opts := flag.Options{
+	return flag.Options{
 		GlobalOptions: flag.GlobalOptions{
 			Timeout:  12 * time.Hour,
 			CacheDir: cacheDir,
@@ -155,6 +190,12 @@ func (s s) scanFS(ctx context.Context, mount string) (trivyTypes.Report, error) 
 		ScanOptions: flag.ScanOptions{
 			Scanners: trivyTypes.Scanners{
 				trivyTypes.VulnerabilityScanner,
+			},
+			// Mounted shares are outside the host scan; an unreadable share
+			// must not discard findings for installed host libraries.
+			SkipDirs: []string{
+				filepath.Join(mount, "Volumes"),
+				filepath.Join(mount, "System/Volumes/Data/Volumes"),
 			},
 			DisableTelemetry:  true,
 			OfflineScan:       true,
@@ -189,28 +230,7 @@ func (s s) scanFS(ctx context.Context, mount string) (trivyTypes.Report, error) 
 				dbTypes.SeverityCritical,
 			},
 		},
-	}
-
-	// Host scans inspect installed libraries without resolving parent POMs
-	// in source trees, where cycles can overflow Trivy's parser stack.
-	runner, err := artifact.NewRunner(ctx, opts, artifact.TargetRootfs)
-	if err != nil {
-		return trivyTypes.Report{}, fmt.Errorf(
-			"initializing filesystem scanner: %w",
-			err,
-		)
-	}
-	defer runner.Close(ctx)
-
-	report, err := runner.ScanRootfs(ctx, opts)
-	if err != nil {
-		return trivyTypes.Report{}, fmt.Errorf(
-			"scanning filesystem %q: %w",
-			mount,
-			err,
-		)
-	}
-	return report, nil
+	}, nil
 }
 
 func readSystemVersion(root string) (systemVersion, error) {
