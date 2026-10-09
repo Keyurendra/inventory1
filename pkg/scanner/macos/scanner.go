@@ -191,7 +191,9 @@ func (s s) scanFS(ctx context.Context, mount string) (trivyTypes.Report, error) 
 		},
 	}
 
-	runner, err := artifact.NewRunner(ctx, opts, artifact.TargetFilesystem)
+	// Host scans inspect installed libraries without resolving parent POMs
+	// in source trees, where cycles can overflow Trivy's parser stack.
+	runner, err := artifact.NewRunner(ctx, opts, artifact.TargetRootfs)
 	if err != nil {
 		return trivyTypes.Report{}, fmt.Errorf(
 			"initializing filesystem scanner: %w",
@@ -200,7 +202,7 @@ func (s s) scanFS(ctx context.Context, mount string) (trivyTypes.Report, error) 
 	}
 	defer runner.Close(ctx)
 
-	report, err := runner.ScanFilesystem(ctx, opts)
+	report, err := runner.ScanRootfs(ctx, opts)
 	if err != nil {
 		return trivyTypes.Report{}, fmt.Errorf(
 			"scanning filesystem %q: %w",
