@@ -78,8 +78,3 @@ func TestOverlay2LowerDirsOrder(t *testing.T) {
 	assert.Equal(t, filepath.Join(dataRoot, "overlay2", "cache-a", "diff"), lower[1])
 	require.Len(t, cfgOut.RootFS.DiffIDs, 2)
 }
-
-func TestMountKeyFromPath(t *testing.T) {
-	t.Parallel()
-	assert.Equal(t, "abc", mountKeyFromPath("/mnt/abc"))
-}

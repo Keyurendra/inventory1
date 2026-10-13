@@ -8,12 +8,14 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+type osCase struct {
+	name    string
+	markers []string
+	want    string
+}
+
 func TestDetectOS(t *testing.T) {
-	tests := []struct {
-		name    string
-		markers []string
-		want    string
-	}{
+	tests := []osCase{
 		{
 			name: "macOS",
 			markers: []string{

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"runtime"
 
 	winsc "github.com/accuknox/accuknox-windows-scanner/pkg/scanner"
 
@@ -76,40 +75,6 @@ func (s s) scanOffline(ctx context.Context, mountpoint, vmURI, platform string) 
 		fullSystemHivePath,
 		opts,
 	)
-	if err != nil {
-		return nil, err
-	}
-
-	return &Result{
-		Platform:   platform,
-		VMUri:      vmURI,
-		OS:         "windows",
-		ScanResult: scanResult,
-	}, nil
-}
-
-func (s s) scanLive(ctx context.Context, vmURI, platform string) (scanner.Findings, error) {
-	if runtime.GOOS != "windows" {
-		return nil, fmt.Errorf("live Windows scanning only supported on Windows OS")
-	}
-
-	opts := winsc.ScanOptions{
-		ShowKBs:                 true,
-		ShowSoftware:            true,
-		ShowMissingKBs:          true,
-		ShowMissingSoftwareKBs:  true,
-		ShowSystemInfo:          true,
-		ShowUSBDevices:          true,
-		ShowNetworkInterfaces:   true,
-		ShowWindowsFeatures:     true,
-		ShowRecentPrograms:      true,
-		ShowFirewallConfig:      true,
-		ShowRemoteDesktopConfig: true,
-		ShowEventLogConfig:      true,
-		ShowBootConfig:          true,
-	}
-
-	scanResult, err := winsc.ScanLive(ctx, s.dbPath, opts)
 	if err != nil {
 		return nil, err
 	}

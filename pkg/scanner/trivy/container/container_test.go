@@ -7,6 +7,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+type nsCase struct {
+	name  string
+	input []string
+	want  []string
+}
+
 func TestRetryRemote(t *testing.T) {
 	t.Parallel()
 	err := errors.New("failed to get reader: content digest sha256:abc: not found")
@@ -108,11 +114,7 @@ func TestKeyOfPrefersImageRefDigestOverImageID(t *testing.T) {
 func TestUniqNS(t *testing.T) {
 	t.Parallel()
 
-	cases := []struct {
-		name  string
-		input []string
-		want  []string
-	}{
+	cases := []nsCase{
 		{
 			name:  "dedups with stable order",
 			input: []string{"default", "k8s.io", "default"},

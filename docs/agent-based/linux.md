@@ -12,7 +12,15 @@ curl https://accuknox-omni.s3.us-east-1.amazonaws.com/v0.1.2/agent-install.sh |\
 - Artifact API tokens can be created under Settings -> Tokens.
 - Labels can be created under Settings -> Labels.
 
+The `v0.1.2` download above is an example of the installation flow. AI agent
+discovery below requires a release that contains that feature.
+
 The installation script creates a systemd service and a daily systemd timer.
+It downloads the Trivy vulnerability and Java databases and the AI agent
+catalog. VM rootfs reports include a top-level `AIAgentDetections` array when
+the catalog is available. An empty array means no catalog matches were found
+on the host. Container image reports do not include host AI detections;
+container image scanning requires a separate opt-in.
 
 ## Air-gap Installation
 
@@ -31,6 +39,10 @@ export OMNI_VULN_DB_REPOSITORY="ghcr.io/aquasecurity/trivy-db" # replace with yo
 export OMNI_SKIP_DOWNLOAD=1
 ./agent-install.sh
 ```
+
+Copy the `db/`, `java-db/`, and `aiagent/` database directories into
+`/var/lib/accuknox-omni/` before running an air-gap scan. Set
+`OMNI_SKIP_DB_DOWNLOAD=true` when the VM cannot reach the database registries.
 
 ## FAQs
 

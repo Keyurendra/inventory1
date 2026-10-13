@@ -24,7 +24,7 @@
 .PARAMETER ClamavMSIInstallerFile
     Path to ClamAV MSI installer (.msi) for airgapped installation.
 .PARAMETER SkipDatabaseDownload
-    Skip downloading ClamAV & MSRC database
+    Skip downloading ClamAV, MSRC, Trivy, and AI agent databases
 .PARAMETER SkipVulnScan
     Skip vulnerability scanning
 .PARAMETER SkipMalwareScan
@@ -206,20 +206,20 @@ function Update-ClamAVDatabase {
     }
 }
 
-function Update-MSRCDatabase {
-    Write-Info "Updating MSRC database..."
+function Update-VulnerabilityDatabases {
+    Write-Info "Updating MSRC, Trivy, and AI agent databases..."
 
     try {
-        $output = & $script:OmniBinPath db download msrc --destination "C:\ProgramData\AccuKnox\Omni" 2>&1
+        $output = & $script:OmniBinPath db download msrc vuln java aiagent --destination "C:\ProgramData\AccuKnox\Omni" 2>&1
         if ($LASTEXITCODE -eq 0) {
-            Write-Info "MSRC database download to C:\ProgramData\AccuKnox\Omni"
+            Write-Info "MSRC, Trivy, and AI agent databases downloaded to C:\ProgramData\AccuKnox\Omni"
         }
         else {
-            Write-Fatal "Failed to download MSRC database: $output"
+            Write-Fatal "Failed to download vulnerability databases: $output"
         }
     }
     catch {
-        Write-Fatal "Failed to download MSRC database: $_"
+        Write-Fatal "Failed to download vulnerability databases: $_"
     }
 }
 
@@ -270,16 +270,17 @@ function New-FreshClamScheduledTask {
     Write-Info "Updates will run every 6 hours"
 }
 
-function New-MSRCDatabaseUpdateScheduledTask {
-    $taskName = "MSRC Database Update"
+function New-VulnerabilityDatabaseUpdateScheduledTask {
+    $taskName = "MSRC and Trivy Database Update"
 
-    Write-Info "Creating scheduled task for automatic MSRC DB updates: $taskName"
+    Write-Info "Creating scheduled task for automatic vulnerability DB updates: $taskName"
 
+    Unregister-ScheduledTask -TaskName "MSRC Database Update" -Confirm:$false -ErrorAction SilentlyContinue
     Unregister-ScheduledTask -TaskName $taskName -Confirm:$false -ErrorAction SilentlyContinue
 
     $action = New-ScheduledTaskAction `
         -Execute $script:OmniBinPath `
-        -Argument "download msrc --destination=C:\ProgramData\AccuKnox\Omni"
+        -Argument "db download msrc vuln java aiagent --destination=C:\ProgramData\AccuKnox\Omni"
 
     $trigger = New-ScheduledTaskTrigger `
         -Once `
@@ -306,13 +307,13 @@ function New-MSRCDatabaseUpdateScheduledTask {
         -Trigger $trigger `
         -Settings $settings `
         -Principal $principal `
-        -Description "Automatically updates MSRC DB"
+        -Description "Automatically updates MSRC, Trivy, and AI agent databases"
 
     Register-ScheduledTask `
         -TaskName $taskName `
         -InputObject $task | Out-Null
 
-    Write-Info "MSRC Database update scheduled task created successfully"
+    Write-Info "MSRC, Trivy, and AI agent database update scheduled task created successfully"
     Write-Info "Updates will run every 12 hours"
 }
 
@@ -320,7 +321,10 @@ function Initialize-Environment {
     $script:Arch = Test-Architecture
     Write-Info "Host architecture: $script:Arch"
 
-    if ([string]::IsNullOrEmpty($script:OmniUrl)) {
+    if (-not [string]::IsNullOrWhiteSpace($DownloadUrl)) {
+        $script:OmniUrl = $DownloadUrl
+    }
+    else {
         $script:OmniUrl = "https://accuknox-omni.s3.us-east-1.amazonaws.com/$Version/omni-windows-$($script:Arch).exe"
     }
 
@@ -339,7 +343,7 @@ function Initialize-Environment {
 
 function Test-Url {
     if (-not ($script:OmniUrl -match "^https?://")) {
-        Write-Fatal "Only http:// and https:// URLs are supported for OMNI_URL (have $($script:OmniUrl))"
+        Write-Fatal "Only http:// and https:// URLs are supported for DownloadUrl (have $($script:OmniUrl))"
     }
 }
 
@@ -518,14 +522,16 @@ try {
     }
     if (-not $SkipVulnScan) {
         if (-not $SkipDatabaseDownload) {
-            Update-MSRCDatabase
-            New-MSRCDatabaseUpdateScheduledTask
+            Update-VulnerabilityDatabases
+            New-VulnerabilityDatabaseUpdateScheduledTask
         }
         else {
-            Write-Info "Skipping downloading MSRC database"
-            $dbPath = Join-Path -Path $Global:OmniHomeDir -ChildPath "msrc\db.sqlite3"
-            if (-not (Test-Path $dbPath)) {
-                Write-Fatal "MSRC database not found at $dbPath and download was skipped"
+            Write-Info "Skipping downloading MSRC, Trivy, and AI agent databases"
+            foreach ($dbFile in @("msrc\db.sqlite3", "db\trivy.db", "java-db\trivy-java.db", "aiagent\aiagentscan.json")) {
+                $dbPath = Join-Path -Path $Global:OmniHomeDir -ChildPath $dbFile
+                if (-not (Test-Path $dbPath)) {
+                    Write-Fatal "Vulnerability database not found at $dbPath and download was skipped"
+                }
             }
         }
     }
@@ -556,10 +562,10 @@ try {
     Write-Info "  View update info:      Get-ScheduledTaskInfo -TaskName 'ClamAV Database Update'"
     Write-Info "  Update manually:       Start-ScheduledTask -TaskName 'ClamAV Database Update'"
     Write-Info ""
-    Write-Info "MSRC DB Update Commands:"
-    Write-Info "  Check update task:     Get-ScheduledTask -TaskName 'MSRC Database Update'"
-    Write-Info "  View update info:      Get-ScheduledTaskInfo -TaskName 'MSRC Database Update'"
-    Write-Info "  Update manually:       Start-ScheduledTask -TaskName 'MSRC Database Update'"
+    Write-Info "MSRC and Trivy DB Update Commands:"
+    Write-Info "  Check update task:     Get-ScheduledTask -TaskName 'MSRC and Trivy Database Update'"
+    Write-Info "  View update info:      Get-ScheduledTaskInfo -TaskName 'MSRC and Trivy Database Update'"
+    Write-Info "  Update manually:       Start-ScheduledTask -TaskName 'MSRC and Trivy Database Update'"
 }
 catch {
     Write-Fatal $_.Exception.Message

@@ -119,8 +119,8 @@ func detectStore(rootfs, dataRoot string, cts []Container) (StoreKind, *offlineC
 	}
 
 	var candidates []storeCandidate
-	if isDir(filepath.Join(dataRoot, "image", "overlay2", "layerdb")) &&
-		isDir(filepath.Join(dataRoot, "overlay2")) {
+	layerdb := filepath.Join(dataRoot, "image", "overlay2", "layerdb")
+	if isDir(layerdb) && isDir(filepath.Join(dataRoot, "overlay2")) {
 		candidates = append(candidates, storeCandidate{kind: StoreOverlay2})
 	}
 

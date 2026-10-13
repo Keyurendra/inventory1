@@ -215,7 +215,7 @@ func (r *ScanReconciler) reconcileScan(ctx context.Context, req ctrl.Request, sc
 		return ctrl.Result{}, fmt.Errorf("ensure orch job: %w", err)
 	}
 	if isNew {
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{RequeueAfter: time.Millisecond}, nil
 	}
 
 	if !isJobFinished(orchJob) {
@@ -229,12 +229,13 @@ func (r *ScanReconciler) reconcileScan(ctx context.Context, req ctrl.Request, sc
 		return r.handleOrchFailure(ctx, scan, orchJob)
 	}
 
-	if _, err := r.updateCondition(ctx, req.NamespacedName, v1alpha1.ScanCondition{
+	cond := v1alpha1.ScanCondition{
 		Type:    v1alpha1.ScanConditionOrchestrationJobFinished,
 		Status:  corev1.ConditionTrue,
 		Reason:  "Completed",
 		Message: fmt.Sprintf("orchestration job %s completed", orchJob.Name),
-	}); err != nil {
+	}
+	if _, err := r.updateCondition(ctx, req.NamespacedName, cond); err != nil {
 		return ctrl.Result{}, fmt.Errorf("update condition: %w", err)
 	}
 
@@ -247,7 +248,7 @@ func (r *ScanReconciler) reconcileScan(ctx context.Context, req ctrl.Request, sc
 		return ctrl.Result{}, fmt.Errorf("ensure scan job: %w", err)
 	}
 	if isNew {
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{RequeueAfter: time.Millisecond}, nil
 	}
 
 	if isJobFailed(scanJob) {
@@ -275,12 +276,13 @@ func (r *ScanReconciler) validateOrchJobAnnotations(ctx context.Context, scan *v
 // handleScanSuccess marks the scan as succeeded and cleans up resources.
 func (r *ScanReconciler) handleScanSuccess(ctx context.Context, scan *v1alpha1.Scan, scanJob, orchJob *batchv1.Job) (ctrl.Result, error) {
 	key := types.NamespacedName{Namespace: scan.Namespace, Name: scan.Name}
-	if _, err := r.updateCondition(ctx, key, v1alpha1.ScanCondition{
+	cond := v1alpha1.ScanCondition{
 		Type:    v1alpha1.ScanConditionScanJobFinished,
 		Status:  corev1.ConditionTrue,
 		Reason:  "Completed",
 		Message: fmt.Sprintf("scan job %s completed", scanJob.Name),
-	}); err != nil {
+	}
+	if _, err := r.updateCondition(ctx, key, cond); err != nil {
 		return ctrl.Result{}, fmt.Errorf("update condition: %w", err)
 	}
 
@@ -795,12 +797,13 @@ func (r *ScanReconciler) ensureRoleBinding(ctx context.Context, scan *v1alpha1.S
 func (r *ScanReconciler) handleOrchFailure(ctx context.Context, scan *v1alpha1.Scan, job *batchv1.Job) (ctrl.Result, error) {
 	msg := fmt.Sprintf("orchestration job %s/%s failed", job.Namespace, job.Name)
 	key := types.NamespacedName{Namespace: scan.Namespace, Name: scan.Name}
-	if _, err := r.updateCondition(ctx, key, v1alpha1.ScanCondition{
+	cond := v1alpha1.ScanCondition{
 		Type:    v1alpha1.ScanConditionOrchestrationJobFinished,
 		Status:  corev1.ConditionFalse,
 		Reason:  "Failed",
 		Message: msg,
-	}); err != nil {
+	}
+	if _, err := r.updateCondition(ctx, key, cond); err != nil {
 		return ctrl.Result{}, fmt.Errorf("update condition: %w", err)
 	}
 
@@ -861,12 +864,13 @@ func (r *ScanReconciler) handleMissingSnapshot(ctx context.Context, scan *v1alph
 func (r *ScanReconciler) handleScanFailure(ctx context.Context, scan *v1alpha1.Scan, job, parent *batchv1.Job) (ctrl.Result, error) {
 	msg := fmt.Sprintf("scan job %s/%s failed", job.Namespace, job.Name)
 	key := types.NamespacedName{Namespace: scan.Namespace, Name: scan.Name}
-	if _, err := r.updateCondition(ctx, key, v1alpha1.ScanCondition{
+	cond := v1alpha1.ScanCondition{
 		Type:    v1alpha1.ScanConditionScanJobFinished,
 		Status:  corev1.ConditionFalse,
 		Reason:  "Failed",
 		Message: msg,
-	}); err != nil {
+	}
+	if _, err := r.updateCondition(ctx, key, cond); err != nil {
 		return ctrl.Result{}, fmt.Errorf("update condition: %w", err)
 	}
 

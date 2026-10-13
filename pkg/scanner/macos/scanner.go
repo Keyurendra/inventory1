@@ -10,14 +10,10 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
-	"time"
 
 	dbTypes "github.com/aquasecurity/trivy-db/pkg/types"
-	"github.com/aquasecurity/trivy/pkg/cache"
-	"github.com/aquasecurity/trivy/pkg/commands/artifact"
 	"github.com/aquasecurity/trivy/pkg/dependency"
 	ftypes "github.com/aquasecurity/trivy/pkg/fanal/types"
-	"github.com/aquasecurity/trivy/pkg/flag"
 	trivyTypes "github.com/aquasecurity/trivy/pkg/types"
 	"github.com/hashicorp/go-version"
 	"github.com/mikeschinkel/go-sofafeed/feeds/v1feed"
@@ -26,6 +22,7 @@ import (
 
 	"github.com/accuknox/omniscan/pkg/scanner"
 	"github.com/accuknox/omniscan/pkg/scanner/trivy"
+	"github.com/accuknox/omniscan/pkg/scanner/trivy/filesystem"
 )
 
 const systemVersionPath = "System/Library/CoreServices/SystemVersion.plist"
@@ -100,7 +97,7 @@ func (s s) Scan(ctx context.Context, mount, vmURI, platform, osType string) (sca
 	return &trivy.Result{
 		SchemaVersion: report.SchemaVersion,
 		CreatedAt:     report.CreatedAt,
-		ArtifactName:  report.ArtifactName,
+		ArtifactName:  vmURI,
 		ArtifactType:  "rootfs",
 		Metadata: trivy.Metadata{
 			Size: report.Metadata.Size,
@@ -132,105 +129,14 @@ func (s s) Scan(ctx context.Context, mount, vmURI, platform, osType string) (sca
 }
 
 func (s s) scanFS(ctx context.Context, mount string) (trivyTypes.Report, error) {
-	opts, err := s.fsOpts(mount)
-	if err != nil {
-		return trivyTypes.Report{}, err
+	// Mounted shares are outside the host scan. Keep rootfs mode so Trivy does
+	// not resolve recursive parent POMs in source trees.
+	skipDirs := []string{
+		filepath.Join(mount, "Volumes"),
+		filepath.Join(mount, "System/Volumes/Data/Volumes"),
 	}
-	slog.InfoContext(
-		ctx,
-		"excluding macOS mounted volumes",
-		"paths",
-		opts.SkipDirs,
-	)
-
-	// Host scans inspect installed libraries without resolving parent POMs
-	// in source trees, where cycles can overflow Trivy's parser stack.
-	runner, err := artifact.NewRunner(ctx, opts, artifact.TargetRootfs)
-	if err != nil {
-		return trivyTypes.Report{}, fmt.Errorf(
-			"initializing filesystem scanner: %w",
-			err,
-		)
-	}
-	defer runner.Close(ctx)
-
-	report, err := runner.ScanRootfs(ctx, opts)
-	if err != nil {
-		return trivyTypes.Report{}, fmt.Errorf(
-			"scanning filesystem %q: %w",
-			mount,
-			err,
-		)
-	}
-	return report, nil
-}
-
-func (s s) fsOpts(mount string) (flag.Options, error) {
-	cacheDir := s.cacheDir
-	if cacheDir == "" {
-		var err error
-		cacheDir, err = os.UserCacheDir()
-		if err != nil {
-			return flag.Options{}, fmt.Errorf(
-				"getting user cache directory: %w",
-				err,
-			)
-		}
-	}
-
-	return flag.Options{
-		GlobalOptions: flag.GlobalOptions{
-			Timeout:  12 * time.Hour,
-			CacheDir: cacheDir,
-			Quiet:    true,
-		},
-		CacheOptions: flag.CacheOptions{
-			CacheBackend: string(cache.TypeMemory),
-		},
-		ScanOptions: flag.ScanOptions{
-			Scanners: trivyTypes.Scanners{
-				trivyTypes.VulnerabilityScanner,
-			},
-			// Mounted shares are outside the host scan; an unreadable share
-			// must not discard findings for installed host libraries.
-			SkipDirs: []string{
-				filepath.Join(mount, "Volumes"),
-				filepath.Join(mount, "System/Volumes/Data/Volumes"),
-			},
-			DisableTelemetry:  true,
-			OfflineScan:       true,
-			Target:            mount,
-			DetectionPriority: ftypes.PriorityPrecise,
-		},
-		VulnerabilityOptions: flag.VulnerabilityOptions{
-			VulnSeveritySources: []dbTypes.SourceID{"auto"},
-		},
-		DBOptions: flag.DBOptions{
-			SkipDBUpdate:     true,
-			SkipJavaDBUpdate: true,
-		},
-		PackageOptions: flag.PackageOptions{
-			PkgTypes: []string{trivyTypes.PkgTypeLibrary},
-			PkgRelationships: []ftypes.Relationship{
-				ftypes.RelationshipUnknown,
-				ftypes.RelationshipRoot,
-				ftypes.RelationshipWorkspace,
-				ftypes.RelationshipDirect,
-				ftypes.RelationshipIndirect,
-			},
-		},
-		ReportOptions: flag.ReportOptions{
-			Format:      trivyTypes.FormatJSON,
-			ListAllPkgs: true,
-			Severities: []dbTypes.Severity{
-				dbTypes.SeverityUnknown,
-				dbTypes.SeverityLow,
-				dbTypes.SeverityMedium,
-				dbTypes.SeverityHigh,
-				dbTypes.SeverityCritical,
-			},
-		},
-	}, nil
+	slog.InfoContext(ctx, "excluding macOS mounted volumes", "paths", skipDirs)
+	return filesystem.ScanRootfs(ctx, mount, s.cacheDir, skipDirs...)
 }
 
 func readSystemVersion(root string) (systemVersion, error) {

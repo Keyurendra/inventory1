@@ -17,10 +17,9 @@ func cleanupOverlayMount(m *overlayMount) error {
 		return nil
 	}
 	err := unix.Unmount(m.merged, unix.MNT_DETACH)
-	if err != nil &&
-		!errors.Is(err, unix.EINVAL) &&
-		!errors.Is(err, unix.EPERM) &&
-		!errors.Is(err, unix.ENOENT) {
+	ignored := errors.Is(err, unix.EINVAL) || errors.Is(err, unix.EPERM)
+	ignored = ignored || errors.Is(err, unix.ENOENT)
+	if err != nil && !ignored {
 		return fmt.Errorf("unmount %q: %w", m.merged, err)
 	}
 	if err := os.RemoveAll(m.root); err != nil {

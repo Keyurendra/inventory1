@@ -321,19 +321,21 @@ var operatorCmd = &cli.Command{
 			os.Exit(1)
 		}
 
-		if err := (&controller.ScheduleReconciler{
+		schedule := &controller.ScheduleReconciler{
 			Client: mgr.GetClient(),
 			Scheme: mgr.GetScheme(),
-		}).SetupWithManager(mgr); err != nil {
+		}
+		if err := schedule.SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "Schedule")
 			os.Exit(1)
 		}
 
-		if err := (&controller.ScanReconciler{
+		scan := &controller.ScanReconciler{
 			Client:     mgr.GetClient(),
 			Scheme:     mgr.GetScheme(),
 			KubeClient: kubernetes.NewForConfigOrDie(ctrl.GetConfigOrDie()),
-		}).SetupWithManager(mgr); err != nil {
+		}
+		if err := scan.SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "Scan")
 			os.Exit(1)
 		}

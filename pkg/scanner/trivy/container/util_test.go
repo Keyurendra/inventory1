@@ -9,15 +9,17 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+type runtimeCase struct {
+	name    string
+	socket  string
+	runtime string
+	cri     bool
+}
+
 func TestDetectRuntimeWithSocket(t *testing.T) {
 	t.Parallel()
 
-	tests := []struct {
-		name    string
-		socket  string
-		runtime string
-		cri     bool
-	}{
+	tests := []runtimeCase{
 		{
 			name:    "docker",
 			socket:  "/run/docker.sock",
@@ -70,12 +72,7 @@ func TestDetectRuntimeUnknownSocket(t *testing.T) {
 func TestDetectRuntimeCustomSocketPathByToken(t *testing.T) {
 	t.Parallel()
 
-	tests := []struct {
-		name    string
-		socket  string
-		runtime string
-		cri     bool
-	}{
+	tests := []runtimeCase{
 		{
 			name:    "rootless podman",
 			socket:  "/run/user/1001/podman/podman.sock",
@@ -252,25 +249,4 @@ func TestPickRef(t *testing.T) {
 		pickRef(nil, []string{"repo:latest"}, "fallback"),
 	)
 	assert.Equal(t, "fallback", pickRef(nil, nil, "fallback"))
-}
-
-func TestResolveDockerRefFromCache(t *testing.T) {
-	t.Parallel()
-
-	cache := map[string]dockerImageRef{
-		"sha256:id": {
-			image: "docker.io/library/nginx@sha256:abc",
-			id:    "sha256:id",
-		},
-	}
-
-	image, imageID := resolveDockerRef(
-		t.Context(),
-		nil,
-		"docker.io/library/nginx:1.25.4",
-		"sha256:id",
-		cache,
-	)
-	assert.Equal(t, "docker.io/library/nginx@sha256:abc", image)
-	assert.Equal(t, "sha256:id", imageID)
 }

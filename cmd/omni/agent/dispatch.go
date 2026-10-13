@@ -60,14 +60,12 @@ func runDispatch(ctx context.Context, c *cli.Command) error {
 		return fmt.Errorf("creating kubernetes client: %w", err)
 	}
 
-	var selector labels.Selector
+	selector := labels.Everything()
 	if cfg.NodeSelector != nil {
 		selector, err = metav1.LabelSelectorAsSelector(cfg.NodeSelector)
 		if err != nil {
 			return fmt.Errorf("parsing node selector: %w", err)
 		}
-	} else {
-		selector = labels.Everything()
 	}
 
 	nodes, err := kubeClient.CoreV1().Nodes().List(ctx, metav1.ListOptions{
@@ -95,14 +93,15 @@ func runDispatch(ctx context.Context, c *cli.Command) error {
 			dispatcherJobName,
 			metav1.GetOptions{},
 		)
-		if err != nil {
+		switch {
+		case err != nil:
 			slog.WarnContext(
 				ctx,
 				"failed to get dispatcher job, scan jobs will not have owner reference",
 				slog.String("job", dispatcherJobName),
 				slog.Any("error", err),
 			)
-		} else {
+		default:
 			ownerRef = &metav1.OwnerReference{
 				APIVersion:         "batch/v1",
 				Kind:               "Job",

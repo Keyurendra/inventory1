@@ -13,23 +13,25 @@ type ErrorSummary struct {
 	ArtifactAPIError       error  `json:"artifactAPIError,omitempty"`
 }
 
+type errorAlias ErrorSummary
+
+type errSummary struct {
+	OrchestrationError     string `json:"orchestrationError"`
+	MalwareScanError       string `json:"malwareScanError"`
+	VulnScanError          string `json:"vulnScanError"`
+	ContainerVulnScanError string `json:"containerVulnScanError"`
+	ArtifactAPIError       string `json:"artifactAPIError"`
+	*errorAlias
+}
+
 func (s ErrorSummary) MarshalJSON() ([]byte, error) {
-	type Alias ErrorSummary
-	type errSummary struct {
-		OrchestrationError     string `json:"orchestrationError"`
-		MalwareScanError       string `json:"malwareScanError"`
-		VulnScanError          string `json:"vulnScanError"`
-		ContainerVulnScanError string `json:"containerVulnScanError"`
-		ArtifactAPIError       string `json:"artifactAPIError"`
-		*Alias
-	}
 	return json.Marshal(&errSummary{
 		OrchestrationError:     errorToString(s.OrchestrationError),
 		MalwareScanError:       errorToString(s.MalwareScanError),
 		VulnScanError:          errorToString(s.VulnScanError),
 		ContainerVulnScanError: errorToString(s.ContainerVulnScanError),
 		ArtifactAPIError:       errorToString(s.ArtifactAPIError),
-		Alias:                  (*Alias)(&s),
+		errorAlias:             (*errorAlias)(&s),
 	})
 }
 
