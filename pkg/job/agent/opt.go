@@ -11,6 +11,8 @@ type OptFunc func(*opts)
 
 type opts struct {
 	vulnDBDirectory                  string
+	aiAgentCatalogPath               string
+	packageInventory                 bool
 	macOSFeedURL                     string
 	vulnScanEnabled                  bool
 	containerVulnScanEnabled         bool
@@ -72,6 +74,18 @@ func WithClusterName(clusterName string) OptFunc {
 func WithVulnDBDirectory(dir string) OptFunc {
 	return func(o *opts) {
 		o.vulnDBDirectory = dir
+	}
+}
+
+func WithAIAgentCatalogPath(path string) OptFunc {
+	return func(o *opts) {
+		o.aiAgentCatalogPath = path
+	}
+}
+
+func WithPackageInventory() OptFunc {
+	return func(o *opts) {
+		o.packageInventory = true
 	}
 }
 

@@ -36,10 +36,11 @@ type Signals struct {
 }
 
 type PackageSignal struct {
-	Name     string
-	Version  string
-	PURL     string
-	FilePath string
+	Name            string
+	Version         string
+	PURL            string
+	FilePath        string
+	ExecutablePaths []string
 }
 
 func LoadCatalog(path string) (*Catalog, error) {

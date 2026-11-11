@@ -1,0 +1,1411 @@
+{
+  "version": 1,
+  "agents": [
+    {
+      "id": "codex-cli",
+      "name": "Codex CLI",
+      "description": "A coding agent from OpenAI that runs locally on your computer. It can read, modify, and run code to help build features, fix bugs, and understand codebases.",
+      "homepageUrl": "https://developers.openai.com/codex",
+      "repositoryUrl": "https://github.com/openai/codex",
+      "publishedAt": "2026-10-09",
+      "version": "0.162.0",
+      "language": "Rust",
+      "license": "Apache-2.0",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": ["@openai/codex"],
+            "executables": ["codex"],
+            "paths": []
+          }
+        },
+        {
+          "signals": {
+            "packages": [],
+            "executables": [],
+            "paths": ["**/.vscode/extensions/openai.chatgpt-*"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "claude-code",
+      "name": "Claude Code",
+      "description": "An agentic coding tool that runs in the terminal, understands codebases, executes tasks, edits code, and supports Git workflows using natural language.",
+      "homepageUrl": "https://code.claude.com/docs/en/overview",
+      "repositoryUrl": "https://github.com/anthropics/claude-code",
+      "publishedAt": "",
+      "version": "2.1.295",
+      "language": "TypeScript",
+      "license": "",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": ["@anthropic-ai/claude-code"],
+            "executables": ["claude"],
+            "paths": []
+          }
+        },
+        {
+          "signals": {
+            "packages": [],
+            "executables": ["claude"],
+            "paths": ["**/.local/share/claude/versions/*"]
+          }
+        },
+        {
+          "signals": {
+            "packages": ["Anthropic.ClaudeCode"],
+            "executables": [],
+            "paths": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "github-copilot",
+      "name": "GitHub Copilot",
+      "description": "AI-powered coding agent for the terminal that helps developers build, debug, understand, and modify code using natural language, with GitHub workflow integration.",
+      "homepageUrl": "https://github.com/github/copilot-cli/#readme",
+      "repositoryUrl": "https://github.com/github/copilot-cli",
+      "publishedAt": "",
+      "version": "1.0.93",
+      "language": "",
+      "license": "Proprietary",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": ["@github/copilot"],
+            "executables": ["copilot"],
+            "paths": []
+          }
+        },
+        {
+          "signals": {
+            "packages": [],
+            "executables": [],
+            "paths": [
+              "**/.vscode/extensions/github.copilot-*",
+              "**/.vscode/extensions/github.copilot-chat-*"
+            ]
+          }
+        },
+        {
+          "signals": {
+            "packages": [],
+            "executables": [],
+            "paths": ["**/gh/extensions/gh-copilot"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "cursor",
+      "name": "Cursor",
+      "description": "An AI-powered code editor with agent capabilities for understanding codebases, generating and editing code, and executing development tasks.",
+      "homepageUrl": "https://cursor.com/",
+      "repositoryUrl": "https://github.com/cursor/cursor",
+      "publishedAt": "",
+      "version": "3.24",
+      "language": "",
+      "license": "Proprietary",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": ["cursor"],
+            "executables": ["cursor"],
+            "paths": ["**/share/cursor/**"]
+          }
+        },
+        {
+          "signals": {
+            "packages": [],
+            "executables": ["Cursor-*.AppImage"],
+            "paths": []
+          }
+        },
+        {
+          "signals": {
+            "packages": [],
+            "executables": ["Cursor.exe"],
+            "paths": [
+              "**/AppData/Local/Programs/cursor/**",
+              "**/ProgramFiles/cursor/**"
+            ]
+          }
+        },
+        {
+          "signals": {
+            "packages": [],
+            "executables": ["Cursor"],
+            "paths": ["/Applications/Cursor.app/**"]
+          }
+        },
+        {
+          "signals": {
+            "packages": [],
+            "executables": ["agent"],
+            "paths": ["**/.local/bin/agent", "**/.cursor/bin/**"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "gemini-cli",
+      "name": "Gemini CLI",
+      "description": "An open-source AI coding agent that runs in the terminal and can understand codebases, generate and modify code, debug issues, and use tools to automate development tasks.",
+      "homepageUrl": "https://github.com/google-gemini/gemini-cli",
+      "repositoryUrl": "https://github.com/google-gemini/gemini-cli",
+      "publishedAt": "",
+      "version": "0.63.0",
+      "language": "TypeScript",
+      "license": "Apache-2.0",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": ["@google/gemini-cli"],
+            "executables": ["gemini"],
+            "paths": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "windsurf",
+      "name": "Windsurf",
+      "description": "An AI-powered code editor featuring Cascade, an agentic coding assistant that can understand codebases, edit files, and help execute development tasks.",
+      "homepageUrl": "https://windsurf.com/",
+      "repositoryUrl": "",
+      "publishedAt": "",
+      "version": "",
+      "language": "",
+      "license": "Proprietary",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": ["devin-desktop"],
+            "executables": ["windsurf", "devin-desktop"],
+            "paths": ["**/share/devin-desktop/**"]
+          }
+        },
+        {
+          "signals": {
+            "packages": [],
+            "executables": ["windsurf"],
+            "paths": [
+              "/Applications/Windsurf.app",
+              "**/AppData/Local/Programs/Windsurf/*"
+            ]
+          }
+        },
+        {
+          "signals": {
+            "packages": [],
+            "executables": [],
+            "paths": ["**/.vscode/extensions/codeium.codeium-*"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "chatgpt",
+      "name": "ChatGPT",
+      "description": "OpenAI's desktop AI assistant for conversations, working with local files and projects, and accessing coding capabilities through Codex.",
+      "homepageUrl": "https://chatgpt.com/",
+      "repositoryUrl": "",
+      "publishedAt": "2026-08-11",
+      "version": "",
+      "language": "",
+      "license": "Proprietary",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": ["chatgpt"],
+            "executables": ["chatgpt"],
+            "paths": ["**/usr/lib/chatgpt/**"]
+          }
+        },
+        {
+          "signals": {
+            "packages": [],
+            "executables": ["ChatGPT"],
+            "paths": [
+              "/Applications/ChatGPT.app/**",
+              "**/AppData/Local/Programs/ChatGPT/**"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "amazon-q-developer",
+      "name": "Amazon Q Developer",
+      "description": "AWS's AI-powered software development assistant that helps developers generate and explain code, troubleshoot issues, and work with AWS services through IDE integrations and a command-line interface.",
+      "homepageUrl": "https://aws.amazon.com/q/developer/",
+      "repositoryUrl": "https://github.com/aws/amazon-q-developer-cli",
+      "publishedAt": "",
+      "version": "",
+      "language": "",
+      "license": "",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": [],
+            "executables": ["q"],
+            "paths": []
+          }
+        },
+        {
+          "signals": {
+            "packages": [],
+            "executables": [],
+            "paths": ["**/.vscode/extensions/amazonwebservices.amazon-q-vscode-*/"]
+          }
+        },
+        {
+          "signals": {
+            "packages": [],
+            "executables": [],
+            "paths": ["**/plugins/amazon-q/META-INF/plugin.xml"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "cline",
+      "name": "Cline",
+      "description": "An open-source AI coding agent available as a VS Code extension, CLI, desktop app, and SDK. It can edit code, run commands, use tools, and automate development tasks.",
+      "homepageUrl": "https://cline.bot/",
+      "repositoryUrl": "https://github.com/cline/cline",
+      "publishedAt": "",
+      "version": "3.0.70",
+      "language": "TypeScript",
+      "license": "Apache-2.0",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": [],
+            "executables": [],
+            "paths": ["**/.vscode/extensions/saoudrizwan.claude-dev-*"]
+          }
+        },
+        {
+          "signals": {
+            "packages": [],
+            "executables": [],
+            "paths": ["**/.vscode/extensions/cline.cline-*"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "continue",
+      "name": "Continue",
+      "description": "An open-source AI coding agent that helps developers write, edit, review, and understand code through IDE integrations and command-line workflows.",
+      "homepageUrl": "https://continue.dev/",
+      "repositoryUrl": "https://github.com/continuedev/continue",
+      "publishedAt": "",
+      "version": "2.0.0",
+      "language": "TypeScript",
+      "license": "Apache-2.0",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": [],
+            "executables": [],
+            "paths": ["**/.vscode/extensions/Continue.continue-*"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "aider",
+      "name": "Aider",
+      "description": "An open-source AI pair-programming tool that runs in the terminal, understands codebases, edits files, runs linting and tests, and integrates with Git.",
+      "homepageUrl": "https://aider.chat/",
+      "repositoryUrl": "https://github.com/Aider-AI/aider",
+      "publishedAt": "2026-02-12",
+      "version": "",
+      "language": "Python",
+      "license": "Apache-2.0",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": ["aider-chat"],
+            "executables": ["aider"],
+            "paths": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "opencode",
+      "name": "OpenCode",
+      "description": "An open-source AI coding agent that runs in the terminal, understands codebases, edits files, executes development commands, and supports multiple AI model providers.",
+      "homepageUrl": "https://opencode.ai/",
+      "repositoryUrl": "https://github.com/anomalyco/opencode",
+      "publishedAt": "",
+      "version": "",
+      "language": "TypeScript",
+      "license": "MIT",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": ["@opencode/cli", "opencode-ai"],
+            "executables": ["opencode"],
+            "paths": []
+          }
+        },
+        {
+          "signals": {
+            "packages": ["opencode"],
+            "executables": [],
+            "paths": []
+          }
+        },
+        {
+          "signals": {
+            "packages": [],
+            "executables": [],
+            "paths": [
+              "**/.vscode/extensions/opencode.opencode-*",
+              "**/.cursor/extensions/opencode.opencode-*",
+              "**/.windsurf/extensions/opencode.opencode-*"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "kiro",
+      "name": "Kiro",
+      "description": "An AI-powered agentic development environment with an IDE and CLI that helps developers plan work with specifications, generate and modify code, run tools, and work across large codebases.",
+      "homepageUrl": "https://kiro.dev/",
+      "repositoryUrl": "https://github.com/kirodotdev/Kiro",
+      "publishedAt": "2026-09-30",
+      "version": "1.2.37",
+      "language": "",
+      "license": "Proprietary",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": [],
+            "executables": ["kiro-cli"],
+            "paths": []
+          }
+        },
+        {
+          "signals": {
+            "packages": [],
+            "executables": ["kiro"],
+            "paths": ["/Applications/Kiro.app"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "tabnine",
+      "name": "Tabnine",
+      "description": "An AI-powered coding assistant and agent that helps developers generate and explain code, work across codebases, execute development workflows, and apply enterprise coding guidelines.",
+      "homepageUrl": "https://www.tabnine.com/",
+      "repositoryUrl": "https://github.com/codota/TabNine",
+      "publishedAt": "",
+      "version": "",
+      "language": "",
+      "license": "Proprietary",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": [],
+            "executables": [
+              "tabnine",
+              "TabNine",
+              "TabNine-deep-local",
+              "TabNine-deep-cloud",
+              "WD-TabNine",
+              "TabNine-server-runner"
+            ],
+            "paths": [
+              "**/tabnine/**",
+              "**/TabNine/**",
+              "**/TabNine-*",
+              "**/WD-TabNine*"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "cody",
+      "name": "Cody",
+      "description": "An AI coding assistant that uses codebase context to help developers write, edit, debug, and understand code through IDE integrations and a command-line interface.",
+      "homepageUrl": "https://sourcegraph.com/cody",
+      "repositoryUrl": "https://github.com/sourcegraph/cody",
+      "publishedAt": "",
+      "version": "5.5.26",
+      "language": "TypeScript",
+      "license": "Apache-2.0",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": ["@sourcegraph/cody"],
+            "executables": ["cody"],
+            "paths": []
+          }
+        },
+        {
+          "signals": {
+            "packages": [],
+            "executables": [],
+            "paths": [
+              "**/.vscode/extensions/sourcegraph.cody-ai-*",
+              "**/.config/Code/User/globalStorage/sourcegraph.cody-ai/**",
+              "**/AppData/Roaming/Code/User/globalStorage/sourcegraph.cody-ai/**",
+              "**/Library/Application Support/Code/User/globalStorage/sourcegraph.cody-ai/**"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "blackbox-ai",
+      "name": "BLACKBOX AI",
+      "description": "An AI coding assistant and agent that helps developers understand and edit codebases, generate code, automate development workflows, and work from the terminal or IDE.",
+      "homepageUrl": "https://www.blackbox.ai/",
+      "repositoryUrl": "https://github.com/llmcod/blackbox_cli",
+      "publishedAt": "",
+      "version": "1.0.2",
+      "language": "TypeScript",
+      "license": "",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": ["@blackbox_ai/blackbox-cli"],
+            "executables": ["blackbox"],
+            "paths": []
+          }
+        },
+        {
+          "signals": {
+            "packages": [],
+            "executables": [],
+            "paths": ["**/.vscode/extensions/blackboxapp.blackbox-*"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "gemini-code-assist",
+      "name": "Gemini Code Assist",
+      "description": "Google's AI-powered coding assistant that helps developers generate and complete code, understand codebases, debug issues, and improve software development workflows inside supported IDEs.",
+      "homepageUrl": "https://codeassist.google/",
+      "repositoryUrl": "",
+      "publishedAt": "2026-10-08",
+      "version": "2.104.0",
+      "language": "",
+      "license": "Proprietary",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": [],
+            "executables": [],
+            "paths": [
+              "**/.vscode/extensions/google.geminicodeassist-*",
+              "**/.cache/google-vscode-extension/**",
+              "**/Library/Application Support/google-vscode-extension/**",
+              "**/AppData/Local/google-vscode-extension/**"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "junie",
+      "name": "Junie",
+      "description": "JetBrains' AI coding agent that can understand codebases, plan and implement changes, run commands and tests, and support development workflows through the CLI and IDE integrations.",
+      "homepageUrl": "https://junie.jetbrains.com/",
+      "repositoryUrl": "https://github.com/JetBrains/junie",
+      "publishedAt": "",
+      "version": "3555.1",
+      "language": "",
+      "license": "Proprietary",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": [],
+            "executables": ["junie"],
+            "paths": []
+          }
+        },
+        {
+          "signals": {
+            "packages": [],
+            "executables": [],
+            "paths": ["**/.local/share/junie/**", "**/.junie/**"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "zed",
+      "name": "Zed",
+      "description": "A high-performance code editor with built-in AI agent capabilities for understanding codebases, editing files, running development tasks, and collaborating with AI models.",
+      "homepageUrl": "https://zed.dev/",
+      "repositoryUrl": "https://github.com/zed-industries/zed",
+      "publishedAt": "2026-10-07",
+      "version": "1.23.2",
+      "language": "Rust",
+      "license": "GPL-3.0-or-later",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": [],
+            "executables": ["zed"],
+            "paths": [
+              "**/zed.app/**",
+              "**/Library/Application Support/Zed/**",
+              "**/AppData/Local/Zed/**"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "supermaven",
+      "name": "Supermaven",
+      "description": "An AI code-completion assistant known for low-latency suggestions and a large context window, with integrations for VS Code and Neovim.",
+      "homepageUrl": "https://supermaven.com/",
+      "repositoryUrl": "",
+      "publishedAt": "2025-11-21",
+      "version": "1.1.12",
+      "language": "",
+      "license": "Proprietary",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": [],
+            "executables": ["sm-agent"],
+            "paths": ["**/.supermaven/**"]
+          }
+        },
+        {
+          "signals": {
+            "packages": [],
+            "executables": [],
+            "paths": ["**/.vscode/extensions/supermaven.supermaven-*"]
+          }
+        },
+        {
+          "signals": {
+            "packages": [],
+            "executables": [],
+            "paths": [
+              "**/nvim/plugged/supermaven-nvim/**",
+              "**/nvim/site/pack/*/start/supermaven-nvim/**",
+              "**/nvim/site/pack/*/opt/supermaven-nvim/**"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "goose",
+      "name": "Goose",
+      "description": "An open-source, extensible AI agent that runs locally and can research, write, analyze data, edit code, execute commands, and connect to tools through MCP extensions.",
+      "homepageUrl": "https://goose-docs.ai/",
+      "repositoryUrl": "https://github.com/aaif-goose/goose",
+      "publishedAt": "2026-10-08",
+      "version": "1.54.0",
+      "language": "Rust",
+      "license": "Apache-2.0",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": [],
+            "executables": ["goose"],
+            "paths": []
+          }
+        },
+        {
+          "signals": {
+            "packages": [],
+            "executables": [],
+            "paths": [
+              "**/.config/goose/**",
+              "**/AppData/Roaming/Block/goose/**",
+              "/Applications/Goose.app"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "kilo-code",
+      "name": "Kilo Code",
+      "description": "An open-source AI coding agent available as a CLI and IDE extension, capable of generating and editing code, running terminal commands, and connecting to AI models and MCP tools.",
+      "homepageUrl": "https://kilo.ai/",
+      "repositoryUrl": "https://github.com/Kilo-Org/kilocode",
+      "publishedAt": "",
+      "version": "7.8.8",
+      "language": "TypeScript",
+      "license": "MIT",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": ["@kilocode/cli"],
+            "executables": ["kilo"],
+            "paths": ["**/.config/kilo/**", "**/.kilo/**"]
+          }
+        },
+        {
+          "signals": {
+            "packages": [],
+            "executables": [],
+            "paths": [
+              "**/.vscode/extensions/kilocode.kilo-code-*",
+              "**/.config/Code/User/globalStorage/kilocode.kilo-code/**",
+              "**/Library/Application Support/Code/User/globalStorage/kilocode.kilo-code/**",
+              "**/AppData/Roaming/Code/User/globalStorage/kilocode.kilo-code/**"
+            ]
+          }
+        },
+        {
+          "signals": {
+            "packages": [],
+            "executables": [],
+            "paths": ["**/.kilocode/**"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "qwen-code",
+      "name": "Qwen Code",
+      "description": "An open-source, multi-model AI coding agent that runs in the terminal and integrates with editors and other interfaces to help understand codebases, edit code, execute commands, and use tools.",
+      "homepageUrl": "https://github.com/QwenLM/qwen-code",
+      "repositoryUrl": "https://github.com/QwenLM/qwen-code",
+      "publishedAt": "",
+      "version": "0.24.7",
+      "language": "TypeScript",
+      "license": "Apache-2.0",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": ["@qwen-code/qwen-code"],
+            "executables": ["qwen"],
+            "paths": ["**/.qwen/**"]
+          }
+        },
+        {
+          "signals": {
+            "packages": [],
+            "executables": [],
+            "paths": ["**/.qwen/extensions/**"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "grok-cli",
+      "name": "Grok CLI",
+      "description": "A terminal-based AI coding agent from xAI that can plan and execute coding tasks, coordinate subagents, and perform parallel work.",
+      "homepageUrl": "https://x.ai/",
+      "repositoryUrl": "https://github.com/xai-org/grok-build",
+      "publishedAt": "",
+      "version": "1.0.50",
+      "language": "Rust",
+      "license": "Apache-2.0",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": ["@xai-official/grok"],
+            "executables": ["grok"],
+            "paths": ["**/.grok/**"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "amp",
+      "name": "Amp",
+      "description": "An AI coding agent that runs in the terminal, helps plan and execute coding tasks, and integrates with editors such as VS Code, Cursor, Windsurf, Zed, and Neovim.",
+      "homepageUrl": "https://ampcode.com/",
+      "repositoryUrl": "https://github.com/orgs/ampproject/repositories",
+      "publishedAt": "",
+      "version": "",
+      "language": "",
+      "license": "",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": ["@ampcode/cli"],
+            "executables": ["amp"],
+            "paths": ["**/.config/amp/**", "**/.amp/**"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "openhands-cli",
+      "name": "OpenHands CLI",
+      "description": "An open-source terminal-based AI software development agent that can explore codebases, edit files, execute commands, run tests, and automate coding tasks.",
+      "homepageUrl": "https://www.openhands.dev/",
+      "repositoryUrl": "https://github.com/OpenHands/OpenHands-CLI",
+      "publishedAt": "",
+      "version": "1.16.0",
+      "language": "Python",
+      "license": "MIT",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": ["openhands"],
+            "executables": ["openhands"],
+            "paths": ["**/.openhands/**"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "devin-cli",
+      "name": "Devin CLI",
+      "description": "A local AI coding agent from Cognition that runs in the terminal, works with local files and tools, executes coding tasks, and can hand off sessions to Devin Cloud.",
+      "homepageUrl": "https://devin.ai/cli",
+      "repositoryUrl": "",
+      "publishedAt": "",
+      "version": "2026.9.2",
+      "language": "Rust",
+      "license": "Proprietary",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": [],
+            "executables": ["devin"],
+            "paths": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "replit",
+      "name": "Replit",
+      "description": "An AI-powered software development platform with Replit Agent for building, editing, and deploying applications from natural-language instructions, available through a desktop app and browser workspace.",
+      "homepageUrl": "https://replit.com/",
+      "repositoryUrl": "https://github.com/replit/desktop",
+      "publishedAt": "",
+      "version": "",
+      "language": "TypeScript",
+      "license": "",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": [],
+            "executables": ["Replit"],
+            "paths": ["**/Replit.app/**", "**/Replit-*.app/**"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "ollama",
+      "name": "Ollama",
+      "description": "A local AI model runtime that lets users download and run large language models on their own machines and connect them to coding agents and other applications.",
+      "homepageUrl": "https://ollama.com/",
+      "repositoryUrl": "https://github.com/ollama/ollama",
+      "publishedAt": "",
+      "version": "0.34.2",
+      "language": "Go",
+      "license": "MIT",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": [],
+            "executables": ["ollama"],
+            "paths": ["**/lib/ollama/**", "**/share/ollama/**", "**/.ollama/**"]
+          }
+        },
+        {
+          "signals": {
+            "packages": [],
+            "executables": [],
+            "paths": ["**/Ollama.app/**"]
+          }
+        },
+        {
+          "signals": {
+            "packages": [],
+            "executables": [],
+            "paths": [
+              "**/AppData/Local/Programs/Ollama/**",
+              "**/AppData/Local/Ollama/**"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "lm-studio",
+      "name": "LM Studio",
+      "description": "A local AI model platform for downloading and running language models, chatting with them, serving local APIs, and connecting models to coding tools and MCP servers. Includes a desktop app, the lms CLI, and the llmster headless daemon.",
+      "homepageUrl": "https://lmstudio.ai/",
+      "repositoryUrl": "https://github.com/lmstudio-ai/lms",
+      "publishedAt": "",
+      "version": "0.4.26",
+      "language": "",
+      "license": "",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": [],
+            "executables": ["lms", "llmster"],
+            "paths": ["**/.lmstudio/**", "**/LM Studio.app/**"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "gpt4all",
+      "name": "GPT4All",
+      "description": "A local AI application for downloading and running large language models privately on a desktop, chatting with them, and querying local documents using its LocalDocs feature.",
+      "homepageUrl": "https://www.nomic.ai/gpt4all",
+      "repositoryUrl": "https://github.com/nomic-ai/gpt4all",
+      "publishedAt": "2026-02-25",
+      "version": "3.10.0",
+      "language": "C++",
+      "license": "MIT",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": [],
+            "executables": ["gpt4all"],
+            "paths": [
+              "**/.config/gpt4all.io/**",
+              "**/.config/nomic.ai/**",
+              "**/.local/share/nomic.ai/GPT4All/**",
+              "**/Library/Application Support/nomic.ai/GPT4All/**",
+              "**/AppData/Roaming/nomic.ai/**",
+              "**/AppData/Local/nomic.ai/GPT4All/**"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "anythingllm",
+      "name": "AnythingLLM",
+      "description": "A local-first AI application for chatting with documents, connecting language models, and running AI agents with tools and integrations. Available as a desktop app and self-hosted or cloud service, with a CLI for interacting with an AnythingLLM instance.",
+      "homepageUrl": "https://anythingllm.com/",
+      "repositoryUrl": "https://github.com/Mintplex-Labs/anything-llm",
+      "publishedAt": "",
+      "version": "1.16.2",
+      "language": "TypeScript",
+      "license": "MIT",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": [],
+            "executables": ["AnythingLLM"],
+            "paths": [
+              "**/AnythingLLM.app/**",
+              "**/Programs/AnythingLLM/**",
+              "**/anythingllm-desktop/**"
+            ]
+          }
+        },
+        {
+          "signals": {
+            "packages": ["@mintplex-labs/anything-llm-cli"],
+            "executables": ["any"],
+            "paths": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "jan",
+      "name": "Jan",
+      "description": "An open-source AI desktop application for running local language models, chatting privately, using AI agents, and connecting to tools and MCP servers.",
+      "homepageUrl": "https://jan.ai/",
+      "repositoryUrl": "https://github.com/janhq/jan",
+      "publishedAt": "2026-10-09",
+      "version": "0.8.6",
+      "language": "TypeScript",
+      "license": "Apache-2.0",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": [],
+            "executables": ["jan"],
+            "paths": [
+              "**/.local/share/Jan/data/**",
+              "**/.config/Jan/**",
+              "**/Library/Application Support/Jan/data/**",
+              "**/AppData/Roaming/Jan/data/**",
+              "**/.jan/projects/**"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "open-webui",
+      "name": "Open WebUI",
+      "description": "A self-hosted AI interface for local and cloud language models, with chat, document retrieval (RAG), tool calling, extensions, and integrations for AI agents.",
+      "homepageUrl": "https://openwebui.com/",
+      "repositoryUrl": "https://github.com/open-webui/open-webui",
+      "publishedAt": "",
+      "version": "",
+      "language": "Python, TypeScript",
+      "license": "BSD-3-Clause",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": ["open-webui"],
+            "executables": ["open-webui"],
+            "paths": ["**/.open-webui/**"]
+          }
+        },
+        {
+          "signals": {
+            "packages": [],
+            "executables": [],
+            "paths": ["**/Open WebUI.app/**"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "localai",
+      "name": "LocalAI",
+      "description": "An open-source, self-hosted AI inference engine for running language, image, audio, and other models locally through an OpenAI-compatible API, with support for tools and agent workflows.",
+      "homepageUrl": "https://localai.io/",
+      "repositoryUrl": "https://github.com/mudler/LocalAI",
+      "publishedAt": "",
+      "version": "4.11.0",
+      "language": "Go",
+      "license": "MIT",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": [],
+            "executables": ["local-ai"],
+            "paths": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "llama-cpp",
+      "name": "llama.cpp",
+      "description": "An open-source, high-performance inference engine for running large language and vision-language models locally, with CLI tools and an OpenAI-compatible API server.",
+      "homepageUrl": "https://llama.cpp/",
+      "repositoryUrl": "https://github.com/ggml-org/llama.cpp",
+      "publishedAt": "",
+      "version": "",
+      "language": "C, C++",
+      "license": "MIT",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": [],
+            "executables": ["llama", "llama-cli", "llama-server"],
+            "paths": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "pinokio",
+      "name": "Pinokio",
+      "description": "A local AI browser and one-click launcher for discovering, installing, running, and managing AI applications, models, agents, and development tools on a personal computer.",
+      "homepageUrl": "https://pinokio.work/",
+      "repositoryUrl": "https://github.com/pinokiocomputer/pinokio",
+      "publishedAt": "2026-09-02",
+      "version": "8.2.0",
+      "language": "JavaScript",
+      "license": "MIT",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": [],
+            "executables": ["pinokio"],
+            "paths": ["**/Pinokio.app/**"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "langchain",
+      "name": "LangChain",
+      "description": "An open-source framework for building LLM-powered applications and AI agents, with model integrations, tool calling, retrieval-augmented generation (RAG), and agent workflows.",
+      "homepageUrl": "https://www.langchain.com/",
+      "repositoryUrl": "https://github.com/langchain-ai/langchain",
+      "publishedAt": "2026-10-08",
+      "version": "1.4.4",
+      "language": "Python",
+      "license": "MIT",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": ["langchain"],
+            "executables": [],
+            "paths": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "llamaindex",
+      "name": "LlamaIndex",
+      "description": "An open-source framework for building LLM-powered applications and AI agents, with data ingestion, indexing, retrieval, RAG, and tool integrations for agentic workflows.",
+      "homepageUrl": "https://www.llamaindex.ai/",
+      "repositoryUrl": "https://github.com/run-llama/llama_index",
+      "publishedAt": "2026-09-21",
+      "version": "0.14.25",
+      "language": "Python",
+      "license": "MIT",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": ["llama-index"],
+            "executables": [],
+            "paths": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "crewai",
+      "name": "CrewAI",
+      "description": "An open-source Python framework for building and orchestrating role-based AI agent teams that collaborate on tasks using tools, workflows, and shared context.",
+      "homepageUrl": "https://www.crewai.com/",
+      "repositoryUrl": "https://github.com/crewAIInc/crewAI",
+      "publishedAt": "2026-10-08",
+      "version": "1.15.26",
+      "language": "Python",
+      "license": "MIT",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": ["crewai"],
+            "executables": ["crewai"],
+            "paths": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "autogen",
+      "name": "AutoGen",
+      "description": "An open-source framework for building multi-agent AI applications, with agent conversations, tool execution, event-driven runtimes, and workflows for agents collaborating on tasks.",
+      "homepageUrl": "https://microsoft.github.io/autogen/",
+      "repositoryUrl": "https://github.com/microsoft/autogen",
+      "publishedAt": "",
+      "version": "0.7.5",
+      "language": "Python",
+      "license": "MIT",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": ["autogen-agentchat", "autogen-core"],
+            "executables": [],
+            "paths": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "flowise",
+      "name": "Flowise",
+      "description": "A visual, low-code platform for building AI agents and LLM workflows, including retrieval-augmented generation (RAG), tool integrations, and multi-step orchestration.",
+      "homepageUrl": "https://flowiseai.com/",
+      "repositoryUrl": "https://github.com/FlowiseAI/Flowise",
+      "publishedAt": "",
+      "version": "3.1.4",
+      "language": "TypeScript, JavaScript",
+      "license": "Apache-2.0 (with commercially licensed enterprise components)",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": ["flowise"],
+            "executables": ["flowise"],
+            "paths": ["**/.flowise/**"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "google-antigravity",
+      "name": "Google Antigravity",
+      "description": "An agentic development platform that uses autonomous AI agents to plan and execute coding tasks, interact with project files, run commands, and coordinate development workflows through a desktop IDE and terminal CLI.",
+      "homepageUrl": "https://www.antigravity.google/",
+      "repositoryUrl": "https://github.com/google-antigravity/antigravity-cli",
+      "publishedAt": "",
+      "version": "1.2.9",
+      "language": "",
+      "license": "Proprietary",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": [],
+            "executables": ["agy"],
+            "paths": ["**/.gemini/antigravity/**"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "mistral-vibe",
+      "name": "Mistral Vibe",
+      "description": "An open-source terminal-based AI coding agent from Mistral AI that understands codebases, edits files, executes commands, and supports tool integrations and Agent Client Protocol (ACP) clients.",
+      "homepageUrl": "https://mistral.ai/",
+      "repositoryUrl": "https://github.com/mistralai/mistral-vibe",
+      "publishedAt": "2026-10-09",
+      "version": "2.26.1",
+      "language": "Python",
+      "license": "Apache-2.0",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": ["mistral-vibe"],
+            "executables": ["vibe", "vibe-acp"],
+            "paths": ["**/.vibe/**"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "perplexity-comet",
+      "name": "Perplexity Comet",
+      "description": "An AI-powered web browser with an integrated assistant that can understand browsing context, research across websites, and perform multi-step tasks such as comparing information and drafting emails.",
+      "homepageUrl": "https://www.perplexity.ai/comet",
+      "repositoryUrl": "",
+      "publishedAt": "",
+      "version": "",
+      "language": "",
+      "license": "Proprietary",
+      "category": "AI Agent",
+      "platforms": ["windows", "macos"],
+      "installations": [
+        {
+          "signals": {
+            "packages": [],
+            "executables": ["comet.exe"],
+            "paths": ["**/Perplexity/Comet/Application/**"]
+          }
+        },
+        {
+          "signals": {
+            "packages": [],
+            "executables": ["Comet"],
+            "paths": ["/Applications/Comet.app/**"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "open-interpreter",
+      "name": "Open Interpreter",
+      "description": "An open-source local AI assistant that lets users interact with language models to execute code, manipulate files, analyze data, and automate computer tasks with user approval.",
+      "homepageUrl": "https://www.openinterpreter.com/",
+      "repositoryUrl": "https://github.com/OpenInterpreter/open-interpreter",
+      "publishedAt": "2024-10-26",
+      "version": "0.4.3",
+      "language": "Python",
+      "license": "MIT",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": [],
+            "executables": ["interpreter"],
+            "paths": ["**/.openinterpreter/**"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "plandex",
+      "name": "Plandex",
+      "description": "An open-source, terminal-based AI coding agent designed for large projects. It plans and executes multi-step coding tasks, edits multiple files, runs commands, and provides a reviewable diff workflow.",
+      "homepageUrl": "https://plandex.ai/",
+      "repositoryUrl": "https://github.com/plandex-ai/plandex",
+      "publishedAt": "2026-07-16",
+      "version": "2.2.1",
+      "language": "Go",
+      "license": "MIT",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": [],
+            "executables": ["plandex"],
+            "paths": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "gpt-engineer",
+      "name": "GPT Engineer",
+      "description": "An AI coding tool that turns natural-language software specifications into code, generates project structures, and supports iterative improvements to existing codebases.",
+      "homepageUrl": "https://gptengineer.app/",
+      "repositoryUrl": "https://github.com/gpt-engineer-org/gpt-engineer",
+      "publishedAt": "2024-06-06",
+      "version": "0.3.1",
+      "language": "Python",
+      "license": "MIT",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": ["gpt-engineer"],
+            "executables": ["gpt-engineer"],
+            "paths": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "tabby",
+      "name": "Tabby",
+      "description": "A self-hosted AI coding assistant that provides code completion and codebase-aware assistance, with support for local deployment, model customization, and editor integrations.",
+      "homepageUrl": "https://www.tabbyml.com/",
+      "repositoryUrl": "https://github.com/TabbyML/tabby",
+      "publishedAt": "",
+      "version": "0.32.0",
+      "language": "Rust, TypeScript",
+      "license": "Apache-2.0 (with enterprise components under a commercial license)",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": [],
+            "executables": ["tabby"],
+            "paths": ["**/.tabby/**"]
+          }
+        },
+        {
+          "signals": {
+            "packages": [],
+            "executables": [],
+            "paths": ["**/.vscode/extensions/TabbyML.vscode-tabby-*"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "mini-swe-agent",
+      "name": "Mini-SWE-Agent",
+      "description": "A lightweight AI software engineering agent that works with code repositories, executes commands, and attempts to solve coding issues with a minimal agent implementation.",
+      "homepageUrl": "https://mini-swe-agent.com/",
+      "repositoryUrl": "https://github.com/SWE-agent/mini-swe-agent",
+      "publishedAt": "2026-07-23",
+      "version": "2.4.6",
+      "language": "Python",
+      "license": "MIT",
+      "category": "AI Agent",
+      "platforms": ["linux", "macos", "windows"],
+      "installations": [
+        {
+          "signals": {
+            "packages": ["mini-swe-agent"],
+            "executables": ["mini"],
+            "paths": []
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -8,9 +8,10 @@ func PackageSignalsFromTrivyResults(results types.Results) []PackageSignal {
 	for _, result := range results {
 		for _, pkg := range result.Packages {
 			signal := PackageSignal{
-				Name:     pkg.Name,
-				Version:  pkg.Version,
-				FilePath: pkg.FilePath,
+				Name:            pkg.Name,
+				Version:         pkg.Version,
+				FilePath:        pkg.FilePath,
+				ExecutablePaths: pkg.InstalledFiles,
 			}
 
 			if pkg.Identifier.PURL != nil {

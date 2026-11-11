@@ -82,6 +82,25 @@ func Detect(catalog *Catalog, roots []string, packages []PackageSignal, osType s
 		}
 	}
 
+	if osType == "windows" || osType == "macos" {
+		for _, pkg := range packages {
+			for _, executablePath := range pkg.ExecutablePaths {
+				name := path.Base(strings.ReplaceAll(executablePath, "\\", "/"))
+				for _, signal := range executableSignalsForName(name, executableSignals, osType) {
+					addDetection(
+						results,
+						signal.agent,
+						Detection{
+							Type:  "executable",
+							Value: executablePath,
+						},
+						osType,
+					)
+				}
+			}
+		}
+	}
+
 	// Track the first path match for each root + pattern.
 	// This preserves the behavior of the previous implementation,
 	// which stopped path traversal after the first matching directory.

@@ -10,18 +10,46 @@ pkgs.writeShellScriptBin "entrypoint-kubernetes-node-scan" ''
   artifactAPISkipTLSVerification=false
   repoSkipTLSVerification=false
   repoUsePlainHTTP=false
+  packageInventory=false
+  forwardArgs=()
 
-  if [[ -z "$ARTIFACT_API_ENDPOINT" ]]; then
+  while (($# > 0)); do
+    case "$1" in
+      --package-inventory|--package-inventory=true)
+        packageInventory=true
+        forwardArgs+=("$1")
+        ;;
+      --package-inventory=*)
+        if [[ $1 == --package-inventory=true ]]; then
+          packageInventory=true
+        fi
+        forwardArgs+=("$1")
+        ;;
+      --ai-agent-catalog-path)
+        forwardArgs+=("$1")
+        if (($# > 1)); then
+          forwardArgs+=("$2")
+          shift
+        fi
+        ;;
+      --ai-agent-catalog-path=*)
+        forwardArgs+=("$1")
+        ;;
+    esac
+    shift
+  done
+
+  if [[ $packageInventory == false && -z "$ARTIFACT_API_ENDPOINT" ]]; then
     echo "env variable ARTIFACT_API_ENDPOINT not set"
     exit 1
   fi
 
-  if [[ -z "$ARTIFACT_API_TENANT_ID" ]]; then
+  if [[ $packageInventory == false && -z "$ARTIFACT_API_TENANT_ID" ]]; then
     echo "env variable ARTIFACT_API_TENANT_ID not set"
     exit 1
   fi
 
-  if [[ -z "$ARTIFACT_API_LABEL" ]]; then
+  if [[ $packageInventory == false && -z "$ARTIFACT_API_LABEL" ]]; then
     echo "env variable ARTIFACT_API_LABEL not set"
     exit 1
   fi
@@ -68,7 +96,7 @@ pkgs.writeShellScriptBin "entrypoint-kubernetes-node-scan" ''
     repoUsePlainHTTP=true
   fi
 
-  if [[ $skipMalwareScan == false ]]; then
+  if [[ $packageInventory == false && $skipMalwareScan == false ]]; then
     echo "[*] Downloading ClamAV DB"
     omni db download clamav \
       --clamav-db-repository="$CLAMAV_DB_REPOSITORY" \
@@ -76,7 +104,7 @@ pkgs.writeShellScriptBin "entrypoint-kubernetes-node-scan" ''
       --plain-http=$repoUsePlainHTTP
   fi
 
-  if [[ $skipVulnScan == false ]]; then
+  if [[ $packageInventory == false && $skipVulnScan == false ]]; then
     if [[ -z $OS ]]; then
       echo "[*] Downloading Vuln & MSRC DB"
       omni db download vuln msrc \
@@ -112,5 +140,6 @@ pkgs.writeShellScriptBin "entrypoint-kubernetes-node-scan" ''
     --clamav-db-directory=$clamavDBDirectory \
     --override-hostname="''${CLUSTER_NAME}/''${NODE_NAME}" \
     --platform=kubernetes \
-    --vm-uri-prefix="''${CLUSTER_NAME}://"
+    --vm-uri-prefix="''${CLUSTER_NAME}://" \
+    "''${forwardArgs[@]}"
 ''

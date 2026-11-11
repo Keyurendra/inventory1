@@ -18,8 +18,9 @@ var scanCmd = &cli.Command{
 	Flags:     cmdUtil.AgentScanCmdFlags(),
 	Arguments: cmdUtil.AgentScanCmdArgs(),
 	Action: func(ctx context.Context, c *cli.Command) error {
+		packageInventory := c.Bool("package-inventory")
 		publisher := file.NewPublisher(c.String("local-publisher-store-path"))
-		if !c.Bool("local-publisher") {
+		if !packageInventory && !c.Bool("local-publisher") {
 			var err error
 			publisher, err = cmdUtil.CreateCSPMPublisher(c)
 			if err != nil {
@@ -30,7 +31,7 @@ var scanCmd = &cli.Command{
 		skipMalwareScan := c.Bool("skip-malware-scan")
 		skipVulnScan := c.Bool("skip-vuln-scan")
 		enableContainerImageScan := c.Bool("enable-container-image-scan")
-		if skipVulnScan && skipMalwareScan && !enableContainerImageScan {
+		if !packageInventory && skipVulnScan && skipMalwareScan && !enableContainerImageScan {
 			return fmt.Errorf("atleast one scaner should be enabled")
 		}
 
@@ -42,8 +43,12 @@ var scanCmd = &cli.Command{
 			agent.WithCRISockets(c.StringSlice("cri-sockets")...),
 			agent.WithContainerImageScanRemoteFallback(c.Bool("container-image-scan-remote-fallback")),
 			agent.WithOverrideHostname(c.String("override-hostname")),
+			agent.WithAIAgentCatalogPath(c.String("ai-agent-catalog-path")),
 			agent.WithPlatform(c.String("platform")),
 			agent.WithVMURIPrefix(c.String("vm-uri-prefix")),
+		}
+		if packageInventory {
+			opts = append(opts, agent.WithPackageInventory())
 		}
 		if c.IsSet("cluster-id") {
 			opts = append(opts, agent.WithClusterID(c.Int("cluster-id")))

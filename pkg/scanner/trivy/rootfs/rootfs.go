@@ -36,10 +36,90 @@ func NewScanner(fns ...OptFunc) (scanner.Scanner, error) {
 }
 
 func (s s) Scan(ctx context.Context, mountpoint, vmURI, platform, osType string) (scanner.Findings, error) {
+	if s.packageInventory {
+		if s.useExternalTrivy {
+			return nil, fmt.Errorf("package inventory requires embedded Trivy")
+		}
+		return s.embeddedInventoryScan(ctx, mountpoint, vmURI, platform, osType)
+	}
 	if s.useExternalTrivy {
 		return s.externalScan(ctx, mountpoint, vmURI, platform, osType)
 	}
 	return s.embeddedScan(ctx, mountpoint, vmURI, platform, osType)
+}
+
+func (s s) embeddedInventoryScan(ctx context.Context, mountpoint, vmURI, platform, osType string) (scanner.Findings, error) {
+	opts := flag.Options{
+		GlobalOptions: flag.GlobalOptions{
+			Timeout:  s.timeout,
+			CacheDir: s.cacheDir,
+			Quiet:    true,
+		},
+		CacheOptions: flag.CacheOptions{
+			CacheBackend: "fs",
+		},
+		ScanOptions: flag.ScanOptions{
+			Scanners:          types.Scanners{types.SBOMScanner},
+			SkipDirs:          s.skipDirs,
+			DisableTelemetry:  true,
+			OfflineScan:       true,
+			SkipVersionCheck:  true,
+			Target:            mountpoint,
+			DetectionPriority: flanalTypes.PriorityPrecise,
+			Parallel:          0,
+		},
+		VulnerabilityOptions: flag.VulnerabilityOptions{
+			SkipVEXRepoUpdate: true,
+		},
+		PackageOptions: flag.PackageOptions{
+			PkgTypes: []string{"os", "library"},
+			PkgRelationships: []flanalTypes.Relationship{
+				flanalTypes.RelationshipUnknown,
+				flanalTypes.RelationshipRoot,
+				flanalTypes.RelationshipWorkspace,
+				flanalTypes.RelationshipDirect,
+				flanalTypes.RelationshipIndirect,
+			},
+		},
+		ReportOptions: flag.ReportOptions{
+			Format:      types.FormatJSON,
+			ListAllPkgs: true,
+		},
+	}
+
+	runner, err := artifact.NewRunner(ctx, opts, artifact.TargetRootfs)
+	if err != nil {
+		return nil, fmt.Errorf("initializing package inventory scanner: %w", err)
+	}
+	defer runner.Close(ctx)
+
+	report, err := runner.ScanRootfs(ctx, opts)
+	if err != nil {
+		return nil, fmt.Errorf("scanning rootfs %s for package inventory: %w", mountpoint, err)
+	}
+
+	return &trivy.Result{
+		SchemaVersion: report.SchemaVersion,
+		CreatedAt:     report.CreatedAt,
+		ArtifactName:  report.ArtifactName,
+		ArtifactType:  "rootfs",
+		Results:       report.Results,
+		Metadata: trivy.Metadata{
+			Size:        report.Metadata.Size,
+			OS:          report.Metadata.OS,
+			ImageID:     report.Metadata.ImageID,
+			DiffIDs:     report.Metadata.DiffIDs,
+			RepoTags:    report.Metadata.RepoTags,
+			RepoDigests: report.Metadata.RepoDigests,
+			ImageConfig: report.Metadata.ImageConfig,
+			Layers:      report.Metadata.Layers,
+			VM: trivy.VMMetadata{
+				URI:      vmURI,
+				Platform: platform,
+				OS:       osType,
+			},
+		},
+	}, nil
 }
 
 func (s s) externalScan(ctx context.Context, mountpoint, vmURI, platform, osType string) (scanner.Findings, error) {

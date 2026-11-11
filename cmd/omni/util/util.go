@@ -128,6 +128,15 @@ func AgentScanCmdFlags() []cli.Flag {
 			Usage: "Override system hostname",
 		},
 		&cli.StringFlag{
+			Name:      "ai-agent-catalog-path",
+			Usage:     "Path to AI-agent detection catalog",
+			TakesFile: true,
+		},
+		&cli.BoolFlag{
+			Name:  "package-inventory",
+			Usage: "Run package inventory only",
+		},
+		&cli.StringFlag{
 			Name:  "platform",
 			Usage: "Platform name",
 			Value: "agent",

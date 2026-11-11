@@ -18,7 +18,8 @@
 .PARAMETER TenantId
     Tenant ID
 .PARAMETER ExtraArgs
-    Additional arguments to pass to the Omni agent scan command
+    Additional arguments to pass to the omni agent scan command. For package inventory,
+    include --package-inventory and --ai-agent-catalog-path with its local JSON file.
 .PARAMETER TriggerImmediately
     Run scan immediately after installation (default: true)
 .PARAMETER ClamavMSIInstallerFile
@@ -55,6 +56,7 @@ $Global:OmniInstallPath = "C:\Program Files\Accuknox\Omni"
 $Global:OmniHomeDir = "C:\ProgramData\Accuknox\Omni"
 $Global:TaskMalwareScan = "AccuKnox Omni Malware Scan"
 $Global:TaskVulnScan = "AccuKnox Omni Vuln Scan"
+$Global:TaskPackageInventory = "AccuKnox Omni Package Inventory"
 
 $ErrorActionPreference = "Stop"
 $ProgressPreference = "SilentlyContinue"
@@ -341,6 +343,48 @@ function Initialize-Environment {
     $script:LogWrapperScript = Join-Path $Global:OmniInstallPath "run-omni-with-logging.ps1"
 }
 
+function Initialize-PackageInventoryMode {
+    $script:PackageInventory = $false
+    foreach ($arg in $ExtraArgs) {
+        if ($arg -match '(?i)^--package-inventory(?:=(?:true|1))?$') {
+            $script:PackageInventory = $true
+            break
+        }
+    }
+
+    if (-not $script:PackageInventory) {
+        return
+    }
+
+    $catalogProvided = $false
+    for ($i = 0; $i -lt $ExtraArgs.Count; $i++) {
+        if ($ExtraArgs[$i] -match '(?i)^--ai-agent-catalog-path=.+$') {
+            $catalogProvided = $true
+            break
+        }
+        if ($ExtraArgs[$i] -ieq "--ai-agent-catalog-path" -and
+            $i + 1 -lt $ExtraArgs.Count -and
+            -not [string]::IsNullOrWhiteSpace($ExtraArgs[$i + 1]) -and
+            -not ($ExtraArgs[$i + 1].StartsWith("--"))) {
+            $catalogProvided = $true
+            break
+        }
+    }
+    if (-not $catalogProvided) {
+        Write-Fatal "Windows package inventory requires --ai-agent-catalog-path in ExtraArgs"
+    }
+    Write-Info "Package inventory mode selected; vulnerability and malware setup will be skipped"
+    foreach ($taskName in @(
+        $Global:TaskVulnScan,
+        $Global:TaskMalwareScan,
+        "MSRC Database Update",
+        "MSRC and Trivy Database Update",
+        "ClamAV Database Update"
+    )) {
+        Unregister-ScheduledTask -TaskName $taskName -Confirm:$false -ErrorAction SilentlyContinue
+    }
+}
+
 function Test-Url {
     if (-not ($script:OmniUrl -match "^https?://")) {
         Write-Fatal "Only http:// and https:// URLs are supported for DownloadUrl (have $($script:OmniUrl))"
@@ -399,11 +443,16 @@ function New-OmniScheduledTask {
     New-Item -ItemType Directory -Path $script:LogDir -Force | Out-Null
 
     [System.Collections.ArrayList]$tasks = @()
-    if (-not $SkipVulnScan) {
-        $tasks.Add($Global:TaskVulnScan)
+    if ($script:PackageInventory) {
+        $tasks.Add($Global:TaskPackageInventory)
     }
-    if (-not $SkipMalwareScan) {
-        $tasks.Add($Global:TaskMalwareScan)
+    else {
+        if (-not $SkipVulnScan) {
+            $tasks.Add($Global:TaskVulnScan)
+        }
+        if (-not $SkipMalwareScan) {
+            $tasks.Add($Global:TaskMalwareScan)
+        }
     }
 
     if ($tasks.Count -eq 0) {
@@ -430,6 +479,9 @@ function New-OmniScheduledTask {
         }
 
         $logFile = ""
+        if ($task -eq $Global:TaskPackageInventory) {
+            $logFile = Join-Path $script:LogDir "omni-package-inventory.log"
+        }
         if ($task -eq $Global:TaskMalwareScan) {
             $argsList.Add("--skip-vuln-scan")
             $logFile = $script:MalwareScanLogFile
@@ -495,8 +547,9 @@ try {
     Write-Info "Starting AccuKnox Omni installation for Windows..."
     Test-Prerequisites
     Initialize-Environment
+    Initialize-PackageInventoryMode
     Test-Url
-    if (-not $SkipMalwareScan) {
+    if (-not $SkipMalwareScan -and -not $script:PackageInventory) {
         Install-ClamAV
         if (-not $SkipDatabaseDownload) {
             Update-ClamAVDatabase
@@ -520,7 +573,7 @@ try {
             Write-Fatal "Omni binary not found at $script:OmniBinPath and download was skipped"
         }
     }
-    if (-not $SkipVulnScan) {
+    if (-not $SkipVulnScan -and -not $script:PackageInventory) {
         if (-not $SkipDatabaseDownload) {
             Update-VulnerabilityDatabases
             New-VulnerabilityDatabaseUpdateScheduledTask
@@ -538,34 +591,44 @@ try {
     New-OmniScheduledTask
     if ($TriggerImmediately) {
         Write-Info "Starting initial scans..."
-        if (-not $SkipVulnScan) {
+        if (-not $SkipVulnScan -and -not $script:PackageInventory) {
             Start-ScheduledTask -TaskName $Global:TaskVulnScan
         }
-        if (-not $SkipMalwareScan) {
+        if (-not $SkipMalwareScan -and -not $script:PackageInventory) {
             Start-ScheduledTask -TaskName $Global:TaskMalwareScan
+        }
+        if ($script:PackageInventory) {
+            Start-ScheduledTask -TaskName $Global:TaskPackageInventory
         }
     }
     Write-Info "Installation completed successfully!"
     Write-Info ""
     Write-Info "Omni Scan Commands:"
-    Write-Info "  Check vuln scan task status:      Get-ScheduledTask -TaskName 'AccuKnox Omni Vuln Scan'"
-    Write-Info "  View vuln scan task info:         Get-ScheduledTaskInfo -TaskName 'AccuKnox Omni Vuln Scan'"
-    Write-Info "  Check malware scan task status:   Get-ScheduledTask -TaskName 'AccuKnox Omni Malware Scan'"
-    Write-Info "  View malware scan task info:      Get-ScheduledTaskInfo -TaskName 'AccuKnox Omni Malware Scan'"
-    Write-Info "  Run vuln scan manually:           Start-ScheduledTask -TaskName 'AccuKnox Omni Vuln Scan'"
-    Write-Info "  Run malware scan manually:        Start-ScheduledTask -TaskName 'AccuKnox Omni Malware Scan'"
-    Write-Info "  View live log for malware scan:   Get-Content '$script:MalwareScanLogFile' -Wait"
-    Write-Info "  View live log for vuln scan:      Get-Content '$script:VulnScanLogFile' -Wait"
-    Write-Info ""
-    Write-Info "ClamAV DB Update Commands:"
-    Write-Info "  Check update task:     Get-ScheduledTask -TaskName 'ClamAV Database Update'"
-    Write-Info "  View update info:      Get-ScheduledTaskInfo -TaskName 'ClamAV Database Update'"
-    Write-Info "  Update manually:       Start-ScheduledTask -TaskName 'ClamAV Database Update'"
-    Write-Info ""
-    Write-Info "MSRC and Trivy DB Update Commands:"
-    Write-Info "  Check update task:     Get-ScheduledTask -TaskName 'MSRC and Trivy Database Update'"
-    Write-Info "  View update info:      Get-ScheduledTaskInfo -TaskName 'MSRC and Trivy Database Update'"
-    Write-Info "  Update manually:       Start-ScheduledTask -TaskName 'MSRC and Trivy Database Update'"
+    if ($script:PackageInventory) {
+        Write-Info "  Package inventory task status:   Get-ScheduledTask -TaskName '$Global:TaskPackageInventory'"
+        Write-Info "  Run package inventory manually:  Start-ScheduledTask -TaskName '$Global:TaskPackageInventory'"
+        Write-Info "  View package inventory log:      Get-Content '$script:LogDir\omni-package-inventory.log' -Wait"
+    }
+    else {
+        Write-Info "  Check vuln scan task status:      Get-ScheduledTask -TaskName 'AccuKnox Omni Vuln Scan'"
+        Write-Info "  View vuln scan task info:         Get-ScheduledTaskInfo -TaskName 'AccuKnox Omni Vuln Scan'"
+        Write-Info "  Check malware scan task status:   Get-ScheduledTask -TaskName 'AccuKnox Omni Malware Scan'"
+        Write-Info "  View malware scan task info:      Get-ScheduledTaskInfo -TaskName 'AccuKnox Omni Malware Scan'"
+        Write-Info "  Run vuln scan manually:           Start-ScheduledTask -TaskName 'AccuKnox Omni Vuln Scan'"
+        Write-Info "  Run malware scan manually:        Start-ScheduledTask -TaskName 'AccuKnox Omni Malware Scan'"
+        Write-Info "  View live log for malware scan:   Get-Content '$script:MalwareScanLogFile' -Wait"
+        Write-Info "  View live log for vuln scan:      Get-Content '$script:VulnScanLogFile' -Wait"
+        Write-Info ""
+        Write-Info "ClamAV DB Update Commands:"
+        Write-Info "  Check update task:     Get-ScheduledTask -TaskName 'ClamAV Database Update'"
+        Write-Info "  View update info:      Get-ScheduledTaskInfo -TaskName 'ClamAV Database Update'"
+        Write-Info "  Update manually:       Start-ScheduledTask -TaskName 'ClamAV Database Update'"
+        Write-Info ""
+        Write-Info "MSRC and Trivy DB Update Commands:"
+        Write-Info "  Check update task:     Get-ScheduledTask -TaskName 'MSRC and Trivy Database Update'"
+        Write-Info "  View update info:      Get-ScheduledTaskInfo -TaskName 'MSRC and Trivy Database Update'"
+        Write-Info "  Update manually:       Start-ScheduledTask -TaskName 'MSRC and Trivy Database Update'"
+    }
 }
 catch {
     Write-Fatal $_.Exception.Message

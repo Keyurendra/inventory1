@@ -10,11 +10,13 @@ import (
 	"github.com/accuknox/omniscan/pkg/scanner"
 	"github.com/accuknox/omniscan/pkg/scanner/aiagent"
 	"github.com/accuknox/omniscan/pkg/scanner/clamav"
+	"github.com/accuknox/omniscan/pkg/scanner/macinventory"
 	"github.com/accuknox/omniscan/pkg/scanner/macos"
 	trivyScanner "github.com/accuknox/omniscan/pkg/scanner/trivy"
 	"github.com/accuknox/omniscan/pkg/scanner/trivy/container"
 	"github.com/accuknox/omniscan/pkg/scanner/trivy/rootfs"
 	"github.com/accuknox/omniscan/pkg/scanner/winfs"
+	"github.com/accuknox/omniscan/pkg/scanner/wininventory"
 	"github.com/accuknox/omniscan/pkg/scanner/winvuln"
 )
 
@@ -23,6 +25,7 @@ type RunConfig struct {
 	VulnScan                         bool
 	VulnScanDBDir                    string
 	AIAgentCatalog                   *aiagent.Catalog
+	PackageInventory                 bool
 	MacOSVulnScan                    bool
 	MacOSFeedURL                     string
 	CRISockets                       []string
@@ -37,6 +40,9 @@ type RunConfig struct {
 	OfflineWinVulnScan               bool
 	ContainerVulnScan                bool
 	ContainerImageScanModeAgentless  bool
+	windowsInventoryScanner          scanner.Scanner
+	macOSInventoryScanner            scanner.Scanner
+	aiAgentRoots                     []string
 }
 
 type Run struct {
@@ -75,10 +81,12 @@ func (r Run) ScanMountPoint(ctx context.Context, os, mount, vmURI, platform stri
 
 	result := RunResult{OS: os}
 	var aiAgentRoots []string
-	if r.AIAgentCatalog != nil {
+	if r.aiAgentRoots != nil {
+		aiAgentRoots = r.aiAgentRoots
+	} else if r.AIAgentCatalog != nil {
 		switch os {
 		case "windows":
-			if r.OfflineWinVulnScan {
+			if r.OfflineWinVulnScan && !r.PackageInventory {
 				break
 			}
 			if roots, err := winfs.FixedDrives(); err == nil {
@@ -115,6 +123,57 @@ func (r Run) ScanMountPoint(ctx context.Context, os, mount, vmURI, platform stri
 			return err
 		}
 		return nil
+	}
+
+	if r.PackageInventory {
+		if os == "windows" {
+			inventoryScanner := r.windowsInventoryScanner
+			if inventoryScanner == nil {
+				inventoryScanner = wininventory.NewScanner(wininventory.WithCacheDirectory(r.VulnScanDBDir))
+			}
+			finding, err := inventoryScanner.Scan(ctx, mount, vmURI, platform, os)
+			if err != nil {
+				return nil, fmt.Errorf("scanning Windows package inventory: %w", err)
+			}
+			if err := trackedPub(ctx, finding); err != nil {
+				return &result, nil
+			}
+			return &result, nil
+		}
+		if os == "macos" {
+			inventoryScanner := r.macOSInventoryScanner
+			if inventoryScanner == nil {
+				inventoryScanner = macinventory.NewScanner(macinventory.WithCacheDirectory(r.VulnScanDBDir))
+			}
+			finding, err := inventoryScanner.Scan(ctx, mount, vmURI, platform, os)
+			if err != nil {
+				return nil, fmt.Errorf("scanning macOS package inventory: %w", err)
+			}
+			if err := trackedPub(ctx, finding); err != nil {
+				return &result, nil
+			}
+			return &result, nil
+		}
+		if os != "linux" {
+			return nil, fmt.Errorf("package inventory is currently supported only on Linux, Windows, and macOS")
+		}
+
+		opts := []rootfs.OptFunc{rootfs.WithPackageInventory()}
+		if r.VulnScanDBDir != "" {
+			opts = append(opts, rootfs.WithCacheDirectory(r.VulnScanDBDir))
+		}
+		s, err := rootfs.NewScanner(opts...)
+		if err != nil {
+			return nil, fmt.Errorf("initializing package inventory scanner: %w", err)
+		}
+		finding, err := s.Scan(ctx, mount, vmURI, platform, os)
+		if err != nil {
+			return nil, fmt.Errorf("scanning rootfs %s for package inventory: %w", mount, err)
+		}
+		if err := trackedPub(ctx, finding); err != nil {
+			return &result, nil
+		}
+		return &result, nil
 	}
 
 	// clamAV supports both windows and linux

@@ -159,16 +159,15 @@ func (j Job) scanMountPoint(ctx context.Context, mountpoint, vmURI string) (*job
 		slog.String("partition_name", mountpoint),
 		slog.String("os", osType),
 	)
-	catalogPath := filepath.Join(j.vulnDBDirectory, "aiagent", "aiagentscan.json")
-	catalog, err := aiagent.LoadCatalog(catalogPath)
+	if j.packageInventory && osType != "linux" && osType != "windows" && osType != "macos" {
+		return nil, fmt.Errorf("package inventory is currently supported only on Linux, Windows, and macOS")
+	}
+	if j.packageInventory && j.aiAgentCatalogPath == "" {
+		return nil, fmt.Errorf("package inventory requires --ai-agent-catalog-path")
+	}
+	catalog, err := j.loadAIAgentCatalog(ctx)
 	if err != nil {
-		j.logger.WarnContext(
-			ctx,
-			"AI-agent catalog unavailable; continuing without AI-agent detection",
-			slog.String("path", catalogPath),
-			slog.Any("error", err),
-		)
-		catalog = nil
+		return nil, err
 	}
 	run := job.NewRun(job.RunConfig{
 		Logger:                           j.logger,
@@ -179,6 +178,7 @@ func (j Job) scanMountPoint(ctx context.Context, mountpoint, vmURI string) (*job
 		ClusterName:                      j.clusterName,
 		VulnScanDBDir:                    j.vulnDBDirectory,
 		AIAgentCatalog:                   catalog,
+		PackageInventory:                 j.packageInventory,
 		MacOSVulnScan:                    true,
 		MacOSFeedURL:                     j.macOSFeedURL,
 		CRISockets:                       j.criSockets,
@@ -202,4 +202,26 @@ func (j Job) scanMountPoint(ctx context.Context, mountpoint, vmURI string) (*job
 			return j.pub.Publish(ctx, f)
 		},
 	)
+}
+
+func (j Job) loadAIAgentCatalog(ctx context.Context) (*aiagent.Catalog, error) {
+	catalogPath := j.aiAgentCatalogPath
+	if catalogPath == "" {
+		catalogPath = filepath.Join(j.vulnDBDirectory, "aiagent", "aiagentscan.json")
+	}
+
+	catalog, err := aiagent.LoadCatalog(catalogPath)
+	if err != nil {
+		if j.aiAgentCatalogPath != "" {
+			return nil, fmt.Errorf("loading AI-agent catalog %q: %w", catalogPath, err)
+		}
+		j.logger.WarnContext(
+			ctx,
+			"AI-agent catalog unavailable; continuing without AI-agent detection",
+			slog.String("path", catalogPath),
+			slog.Any("error", err),
+		)
+		return nil, nil
+	}
+	return catalog, nil
 }

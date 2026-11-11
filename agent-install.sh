@@ -11,6 +11,7 @@ OMNI_SKIP_DOWNLOAD="${OMNI_SKIP_DOWNLOAD:-false}"
 OMNI_ARTIFACT_API_TOKEN="${OMNI_ARTIFACT_API_TOKEN:-}"
 OMNI_TRIGGER_IMMEDIATELY="${OMNI_RUN_IMMEDIATELY:-true}"
 OMNI_SKIP_DB_DOWNLOAD="${OMNI_SKIP_DB_DOWNLOAD:-false}"
+OMNI_PACKAGE_INVENTORY=false
 DEFAULT_VULN_DB_REPOSITORY=ghcr.io/aquasecurity/trivy-db
 DEFAULT_JAVA_DB_REPOSITORY=ghcr.io/aquasecurity/trivy-java-db
 OMNI_VULN_DB_REPOSITORY="${OMNI_VULN_DB_REPOSITORY:-$DEFAULT_VULN_DB_REPOSITORY}"
@@ -177,6 +178,13 @@ setup_env() {
     fi
 
     setup_os
+    for arg in "$@"; do
+        case $arg in
+            --package-inventory | --package-inventory=true)
+                OMNI_PACKAGE_INVENTORY=true
+                ;;
+        esac
+    done
     setup_verify_downloader curl || setup_verify_downloader wget || \
         fatal 'Can not find curl or wget for downloading files'
     setup_arch
@@ -273,7 +281,8 @@ create_systemd_service_file() {
         echo 'StandardOutput=journal'
         echo 'StandardError=journal'
         echo 'SyslogIdentifier=accuknox-omni'
-        if ! is_true "$OMNI_SKIP_DB_DOWNLOAD"; then
+        if ! is_true "$OMNI_SKIP_DB_DOWNLOAD" && \
+            { [[ $OS != linux ]] || ! is_true "$OMNI_PACKAGE_INVENTORY"; }; then
             echo "ExecStartPre=$OMNI_BIN_PATH $DB_DOWNLOAD_CMD_EXEC"
             if is_false "$OMNI_SKIP_MALWARE_SCAN" && \
                 [[ -x $(command -v freshclam) ]]; then
@@ -364,7 +373,8 @@ create_launchd_runner() {
         echo
         echo 'set -euo pipefail'
         echo
-        if ! is_true "$OMNI_SKIP_DB_DOWNLOAD"; then
+        if ! is_true "$OMNI_SKIP_DB_DOWNLOAD" && \
+            { [[ $OS != linux ]] || ! is_true "$OMNI_PACKAGE_INVENTORY"; }; then
             printf '%s %s\n' "$(quote "$OMNI_BIN_PATH")" \
                 "$DB_DOWNLOAD_CMD_EXEC"
             if is_false "$OMNI_SKIP_MALWARE_SCAN" && \
